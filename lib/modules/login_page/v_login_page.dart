@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:kana_oo_admin/modules/login_page/c_login_page.dart';
+import 'package:kana_oo_admin/modules/main_page/v_main_page.dart';
 import 'package:kana_oo_admin/services/c_data_controller.dart';
 import 'package:kana_oo_admin/services/c_theme_controller.dart';
 import 'package:get/get.dart';
@@ -123,7 +124,7 @@ class LoginPage extends StatelessWidget {
                               const SizedBox(height: 10),
                               ElevatedButton(
                                 onPressed: () {
-                                  print("HIii");
+                                  Get.offAll(const MainPage());
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: background,

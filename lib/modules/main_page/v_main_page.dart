@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:kana_oo_admin/modules/home_page/v_home_page.dart';
 import 'package:get/get.dart';
 import 'package:kana_oo_admin/modules/main_page/c_main_page.dart';
+import 'package:kana_oo_admin/modules/product_page/v_product_page.dart';
 import 'package:kana_oo_admin/services/c_theme_controller.dart';
 
 class MainPage extends StatelessWidget {
@@ -44,7 +45,6 @@ class MainPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           IconButton(
-                            splashRadius: 5,
                             isSelected: value == 0 ? true : false,
                             selectedIcon: Icon(
                               Iconsax.home_1,
@@ -61,28 +61,28 @@ class MainPage extends StatelessWidget {
                           IconButton(
                             isSelected: value == 1 ? true : false,
                             selectedIcon: Icon(
-                              Iconsax.shopping_bag,
+                              Iconsax.chart_2,
                               color: secondary,
                             ),
                             onPressed: () {
                               controller.index_.value = 1;
                             },
                             icon: const Icon(
-                              Iconsax.shopping_bag,
+                              Iconsax.chart_2,
                               color: Colors.grey,
                             ),
                           ),
                           IconButton(
                             isSelected: value == 2 ? true : false,
                             selectedIcon: Icon(
-                              Iconsax.heart,
+                              Iconsax.box_add,
                               color: secondary,
                             ),
                             onPressed: () {
                               controller.index_.value = 2;
                             },
                             icon: const Icon(
-                              Iconsax.heart,
+                              Iconsax.box_add,
                               color: Colors.grey,
                             ),
                           ),
@@ -120,7 +120,7 @@ class MainPage extends StatelessWidget {
       case 1:
         return const HomePage();
       case 2:
-        return const HomePage();
+        return const ProductPage();
       case 3:
         return const HomePage();
       default:
