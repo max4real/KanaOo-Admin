@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
-import 'package:kana_oo_admin/modules/main_page/v_main_page.dart';
+import 'package:kana_oo_admin/modules/login_page/v_login_page.dart';
+import 'package:get/get.dart';
+import 'package:kana_oo_admin/services/c_data_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -8,6 +9,7 @@ void main() async {
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(useMaterial3: true),
-    home: const MainPage(),
+    home: const LoginPage(),
   ));
+  Get.put(DataController());
 }
