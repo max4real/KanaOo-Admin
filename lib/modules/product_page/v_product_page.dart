@@ -126,15 +126,15 @@ class ProductPage extends StatelessWidget {
   Widget shownePage(int index) {
     switch (index) {
       case 0:
-        return const AddProduct();
+        return AddProduct();
       case 1:
-        return const ProductListPage();
+        return const StringMultilineTags();
       case 2:
-        return const AddProduct();
+        return const StringAutoCompleteTags();
       case 3:
-        return const AddProduct();
+        return const StringTags();
       default:
-        return const AddProduct();
+        return AddProduct();
     }
   }
 }
