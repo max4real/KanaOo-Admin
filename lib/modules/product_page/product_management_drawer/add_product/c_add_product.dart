@@ -25,6 +25,7 @@ class AddProductController extends GetxController {
     'yaml',
     'gradle',
     'c',
+    'mms'
   ];
 
   var categoryItems = [

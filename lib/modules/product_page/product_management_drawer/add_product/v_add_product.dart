@@ -1,17 +1,46 @@
 import 'package:flutter/material.dart';
-// import 'package:iconsax/iconsax.dart';
 import 'package:kana_oo_admin/modules/product_page/product_management_drawer/add_product/c_add_product.dart';
 import 'package:kana_oo_admin/services/c_data_controller.dart';
 import 'package:kana_oo_admin/services/c_theme_controller.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 import 'package:get/get.dart';
 
-class AddProduct extends StatelessWidget {
+class AddProduct extends StatefulWidget {
   const AddProduct({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<AddProduct> createState() => _AddProductState();
+}
+
+class _AddProductState extends State<AddProduct> {
+  late double _distanceToField;
+  // late StringTagController _stringTagController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _distanceToField = MediaQuery.of(context).size.width;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // _stringTagController = StringTagController();
     AddProductController controller = Get.put(AddProductController());
+    controller.stringTagController = StringTagController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // _stringTagController.dispose();
+    AddProductController controller = Get.find();
+    controller.stringTagController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    AddProductController controller = Get.find();
     return Scaffold(
       backgroundColor: background,
       resizeToAvoidBottomInset: true,
@@ -84,7 +113,20 @@ class AddProduct extends StatelessWidget {
                         hintStyle: const TextStyle(color: Colors.white60)),
                   ),
                   const SizedBox(height: 20),
-                  // makeTagField(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      makeTagField(),
+                      SizedBox(
+                        width: 40,
+                        child: IconButton(
+                            onPressed: () {
+                              controller.stringTagController.clearTags();
+                            }, icon: const Icon(Icons.clear)),
+                      )
+                    ],
+                  ),
                   const SizedBox(height: 20),
                   const Text("Images"),
                   SizedBox(
@@ -243,64 +285,115 @@ class AddProduct extends StatelessWidget {
 
   Widget makeTagField() {
     AddProductController controller = Get.find();
-
-    return TextFieldTags<String>(
-      textfieldTagsController: controller.stringTagController,
-      initialTags: controller.initialTags,
-      textSeparators: const [' ', ','],
-      letterCase: LetterCase.normal,
-      validator: (String tag) {
-        if (tag == 'php') {
-          return 'No, please just no';
-        } else if (controller.stringTagController.getTags!.contains(tag)) {
-          return 'You\'ve already entered that';
-        }
-        return null;
-      },
-      inputFieldBuilder: (context, inputFieldValues) {
-        return TextField(
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-          onTap: () {
-            controller.stringTagController.getFocusNode?.requestFocus();
-          },
-          onTapOutside: (event) {
-            dismissKeyboard();
-          },
-          controller: inputFieldValues.textEditingController,
-          focusNode: inputFieldValues.focusNode,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: onBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide.none,
+    List<String> initialTags1 = <String>[...controller.initialTags];
+    return SizedBox(
+      height: 70,
+      width: Get.width * 0.7,
+      child: Autocomplete<String>(
+        optionsViewBuilder: (context, onSelected, options) {
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Card(
+                color: primary,
+                elevation: 4.0,
+                child: ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxHeight: 200, maxWidth: 250),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final String option = options.elementAt(index);
+                      return TextButton(
+                        onPressed: () {
+                          onSelected(option);
+                        },
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '#$option',
+                            textAlign: TextAlign.left,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
-            isDense: true,
-            helperText: 'Enter Product Tags',
-            helperStyle: const TextStyle(
-              color: Colors.black,
-            ),
-            hintText: inputFieldValues.tags.isNotEmpty ? '' : "Enter tag...",
-            hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-            errorText: inputFieldValues.error,
-            prefixIconConstraints: BoxConstraints(maxWidth: Get.width * 0.8),
-            prefixIcon: inputFieldValues.tags.isNotEmpty
-                ? SingleChildScrollView(
-                    controller: inputFieldValues.tagScrollController,
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8,
-                        bottom: 8,
-                        left: 8,
-                      ),
-                      child: Wrap(
-                          direction: Axis.horizontal,
-                          spacing: 2.0,
-                          children: inputFieldValues.tags.map((String tag) {
+          );
+        },
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text == '') {
+            return const Iterable<String>.empty();
+          }
+          return initialTags1.where((String option) {
+            return option.contains(textEditingValue.text.toLowerCase());
+          });
+        },
+        onSelected: (String selectedTag) {
+          controller.stringTagController.onTagSubmitted(selectedTag);
+        },
+        fieldViewBuilder:
+            (context, textEditingController, focusNode, onFieldSubmitted) {
+          return TextFieldTags<String>(
+            textEditingController: textEditingController,
+            focusNode: focusNode,
+            textfieldTagsController: controller.stringTagController,
+            initialTags: const [
+              'yaml',
+              'gradle',
+            ],
+            textSeparators: const [' ', ','],
+            letterCase: LetterCase.normal,
+            validator: (String tag) {
+              if (tag == 'php') {
+                return 'No, please just no';
+              } else if (controller.stringTagController.getTags!
+                  .contains(tag)) {
+                return 'You\'ve already entered that';
+              }
+              return null;
+            },
+            inputFieldBuilder: (context, inputFieldValues) {
+              return TextField(
+                onTapOutside: (event) {
+                  dismissKeyboard();
+                },
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+                controller: inputFieldValues.textEditingController,
+                focusNode: inputFieldValues.focusNode,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: onBackground,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  isDense: true,
+                  helperText: 'Enter Product Tags',
+                  helperStyle: const TextStyle(
+                    color: Colors.black,
+                  ),
+                  hintText:
+                      inputFieldValues.tags.isNotEmpty ? '' : "Enter tag...",
+                  errorText: inputFieldValues.error,
+                  prefixIconConstraints:
+                      BoxConstraints(maxWidth: _distanceToField * 0.74),
+                  prefixIcon: inputFieldValues.tags.isNotEmpty
+                      ? SingleChildScrollView(
+                          controller: inputFieldValues.tagScrollController,
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                              children: inputFieldValues.tags.map((String tag) {
                             return Container(
                               decoration: const BoxDecoration(
                                 borderRadius: BorderRadius.all(
@@ -308,20 +401,22 @@ class AddProduct extends StatelessWidget {
                                 ),
                                 color: Color.fromARGB(66, 214, 207, 207),
                               ),
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0, vertical: 5.0),
+                                  horizontal: 10.0, vertical: 4.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   InkWell(
                                     child: Text(
                                       '#$tag',
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 14),
+                                      style:
+                                          const TextStyle(color: Colors.white),
                                     ),
+                                    onTap: () {
+                                      //print("$tag selected");
+                                    },
                                   ),
                                   const SizedBox(width: 4.0),
                                   InkWell(
@@ -338,14 +433,16 @@ class AddProduct extends StatelessWidget {
                               ),
                             );
                           }).toList()),
-                    ),
-                  )
-                : null,
-          ),
-          onChanged: inputFieldValues.onTagChanged,
-          onSubmitted: inputFieldValues.onTagSubmitted,
-        );
-      },
+                        )
+                      : null,
+                ),
+                onChanged: inputFieldValues.onTagChanged,
+                onSubmitted: inputFieldValues.onTagSubmitted,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
